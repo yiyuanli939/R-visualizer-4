@@ -20,6 +20,7 @@ import OutlinePanel from "@/components/OutlinePanel";
 import InspectorPopover, { type InspectorState } from "@/components/InspectorPopover";
 import MemoryGraph from "@/components/MemoryGraph";
 import DeltaBar from "@/components/DeltaBar";
+import LocalGuide from "@/components/LocalGuide";
 import { buildOutline } from "@/lib/outline";
 import { smallestEnclosingSpan, spanText } from "@/lib/spans";
 import type { EditorSelection } from "@/components/Editor";
@@ -49,6 +50,7 @@ function App() {
   const [backend, setBackendState] = useState<Backend>("webr");
   const [tokenInput, setTokenInput] = useState("");
   const [inspector, setInspector] = useState<InspectorState | null>(null);
+  const [showGuide, setShowGuide] = useState(false);
   const inspectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inspectSeq = useRef(0);
   const [status, setStatus] = useState<EngineStatus>({ phase: "unloaded" });
@@ -324,6 +326,13 @@ function App() {
             <option value="webr">{t("backendWebR")}</option>
             <option value="local">{t("backendLocal")}</option>
           </select>
+          <button
+            className="btn btn-icon"
+            title={t("localGuide")}
+            onClick={() => setShowGuide(true)}
+          >
+            ?
+          </button>
           <details className="opts">
             <summary>
               <span className="btn btn-icon" title={t("runOptions")} aria-label={t("runOptions")}>
@@ -465,6 +474,9 @@ function App() {
             <button className="btn btn-icon" onClick={() => void getActiveEngine().init().catch(() => {})}>
               ↻ {t("retry")}
             </button>
+            <button className="btn btn-icon" onClick={() => setShowGuide(true)}>
+              ? {t("localGuideShort")}
+            </button>
           </span>
         )}
         {result?.truncated && <span style={{ color: "var(--chg)" }}>· {t("truncated")}</span>}
@@ -603,6 +615,7 @@ function App() {
         </div>
       </main>
       {inspector && <InspectorPopover state={inspector} onClose={() => setInspector(null)} />}
+      {showGuide && <LocalGuide onClose={() => setShowGuide(false)} />}
     </div>
   );
 }

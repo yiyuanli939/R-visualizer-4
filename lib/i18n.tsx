@@ -22,6 +22,8 @@ const dict = {
   tokenPrompt: ["Paste the token printed by the local backend:", "粘贴本地后端启动时打印的令牌："],
   tokenApply: ["Connect", "连接"],
   retry: ["Retry", "重试"],
+  localGuide: ["Local R tutorial", "Local R 使用教程"],
+  localGuideShort: ["Tutorial", "教程"],
   copied: ["Copied", "已复制"],
   maxSteps: ["Max steps", "最大步数"],
   errorsChip: ["errors — click to jump", "处错误——点击跳转"],
