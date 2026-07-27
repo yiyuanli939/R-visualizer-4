@@ -488,6 +488,20 @@ function App() {
             className="chip flex-none cursor-pointer"
             style={{ color: "var(--del)", borderColor: "var(--del)" }}
             onClick={jumpToNextError}
+            title={(() => {
+              // cascades usually share one root cause — surface the clusters
+              const counts = new Map<string, number>();
+              for (const s of steps) {
+                if (!s.errorMsg) continue;
+                const k = s.errorMsg.slice(0, 60);
+                counts.set(k, (counts.get(k) ?? 0) + 1);
+              }
+              return [...counts.entries()]
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([m, n]) => `${n}× ${m}`)
+                .join("\n");
+            })()}
           >
             ⚠ {result?.nErrors} {t("errorsChip")}
           </button>
