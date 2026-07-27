@@ -1,0 +1,489 @@
+@import "tailwindcss";
+
+/* ── Design tokens ──────────────────────────────────────────────── */
+
+:root {
+  /* light theme: "paper lab" */
+  --bg: #f3f4f7;
+  --panel: #ffffff;
+  --panel-2: #eceef3;
+  --ink: #1c2433;
+  --ink-dim: #5b6575;
+  --ink-faint: #8b93a6;
+  --line: #dcdfe8;
+  --accent: #d95f1e; /* execution orange */
+  --accent-soft: rgba(217, 95, 30, 0.12);
+  --blue: #3564b0; /* data blue */
+  --blue-soft: rgba(53, 100, 176, 0.1);
+  --add: #227952;
+  --add-soft: rgba(34, 121, 82, 0.12);
+  --chg: #a06b12;
+  --chg-soft: rgba(197, 143, 44, 0.18);
+  --del: #b23a3a;
+  --del-soft: rgba(178, 58, 58, 0.12);
+  --code-bg: #fbfbfd;
+  --shadow: 0 1px 2px rgba(20, 28, 45, 0.06), 0 4px 16px rgba(20, 28, 45, 0.05);
+}
+
+:root[data-theme="dark"] {
+  /* dark theme: "navy console" */
+  --bg: #0e1320;
+  --panel: #151c2c;
+  --panel-2: #1b2436;
+  --ink: #e6eaf2;
+  --ink-dim: #9aa4ba;
+  --ink-faint: #616d86;
+  --line: #263149;
+  --accent: #ef7d3d;
+  --accent-soft: rgba(239, 125, 61, 0.16);
+  --blue: #6e9be0;
+  --blue-soft: rgba(110, 155, 224, 0.14);
+  --add: #57be8a;
+  --add-soft: rgba(87, 190, 138, 0.15);
+  --chg: #e0b35e;
+  --chg-soft: rgba(224, 179, 94, 0.2);
+  --del: #e06c6c;
+  --del-soft: rgba(224, 108, 108, 0.15);
+  --code-bg: #111827;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+@theme inline {
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-faint) transparent;
+}
+
+code,
+pre,
+.mono {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+/* ── Shared primitives ─────────────────────────────────────────── */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  flex: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms, transform 80ms;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) {
+  background: var(--panel-2);
+  border-color: var(--ink-faint);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.btn-run {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-run:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+  border-color: var(--accent);
+}
+
+.btn-icon {
+  padding: 5px 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  background: var(--panel);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+/* ── Options popover (⚙) ───────────────────────────────────────── */
+
+details.opts {
+  position: relative;
+}
+details.opts > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.opts > summary::-webkit-details-marker {
+  display: none;
+}
+details.opts[open] > summary .btn {
+  background: var(--panel-2);
+  border-color: var(--accent);
+}
+.opts-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  min-width: 220px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+.opts-panel label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.opts-panel select {
+  margin-left: auto;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.type-badge {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+/* ── Hex pipeline nodes (signature element) ────────────────────── */
+
+.hexnode {
+  --hex: 10px;
+  position: relative;
+  flex: none;
+  clip-path: polygon(
+    var(--hex) 0%, calc(100% - var(--hex)) 0%, 100% 50%,
+    calc(100% - var(--hex)) 100%, var(--hex) 100%, 0% 50%
+  );
+  background: var(--panel-2);
+  border: none;
+  color: var(--ink-dim);
+  padding: 6px 18px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 90px;
+  transition: background 120ms, color 120ms;
+}
+.hexnode:hover {
+  background: color-mix(in srgb, var(--panel-2) 70%, var(--blue-soft));
+}
+.hexnode.done {
+  color: var(--ink);
+  background: var(--blue-soft);
+}
+.hexnode.current {
+  background: var(--accent);
+  color: #fff;
+}
+.hexnode.current .hexdim {
+  color: rgba(255, 255, 255, 0.85);
+}
+.hexdim {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  color: var(--ink-faint);
+}
+.hexlabel {
+  font-family: var(--font-plex-mono), monospace;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hexlink {
+  width: 14px;
+  height: 2px;
+  flex: none;
+  background: var(--line);
+}
+.hexlink.done {
+  background: var(--blue);
+}
+.hexop {
+  flex: none;
+  width: 16px;
+  text-align: center;
+  font-family: var(--font-plex-mono), monospace;
+  font-weight: 600;
+  color: var(--ink-faint);
+  user-select: none;
+}
+.hexop.done {
+  color: var(--blue);
+}
+
+/* ── Data grid ─────────────────────────────────────────────────── */
+
+.dgrid {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+}
+.dgrid-cell {
+  padding: 2px 10px;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--panel);
+}
+.dgrid-cell.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dgrid-cell.na {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.dgrid-cell.diff {
+  background: var(--chg-soft);
+  color: var(--chg);
+}
+.dgrid-head {
+  background: var(--panel-2);
+  font-weight: 600;
+  color: var(--ink-dim);
+  border-bottom: 1.5px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.dgrid-rowno {
+  background: var(--panel-2);
+  color: var(--ink-faint);
+  text-align: right;
+  border-right: 1.5px solid var(--line);
+}
+
+/* ── Console ───────────────────────────────────────────────────── */
+
+.console-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.45;
+}
+.console-line.warn {
+  color: var(--chg);
+}
+.console-line.msg {
+  color: var(--blue);
+}
+.console-line.err {
+  color: var(--del);
+}
+.console-src {
+  color: var(--ink-faint);
+  user-select: none;
+}
+
+/* ── Step slider ───────────────────────────────────────────────── */
+
+.step-track {
+  position: relative;
+  height: 24px;
+  flex: 1;
+  min-width: 60px;
+}
+.step-track input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+.step-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.step-fill {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.step-tick {
+  position: absolute;
+  top: 8px;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  transform: translateX(-1px);
+}
+.step-thumb {
+  position: absolute;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-7px) rotate(90deg);
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%);
+  background: var(--accent);
+  pointer-events: none;
+  transition: left 60ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .step-thumb,
+  .btn,
+  .hexnode {
+    transition: none;
+  }
+}
+
+/* ── CodeMirror overrides ──────────────────────────────────────── */
+
+.cm-editor {
+  height: 100%;
+  font-size: 13px;
+  background: var(--code-bg);
+}
+.cm-editor.cm-focused {
+  outline: none;
+}
+.cm-current-step {
+  background: var(--accent-soft);
+}
+.cm-current-step-first {
+  position: relative;
+}
+.cm-gutters {
+  background: var(--code-bg) !important;
+  border-right: 1px solid var(--line) !important;
+  color: var(--ink-faint) !important;
+}
+.cm-step-arrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* variable flash on change */
+@keyframes var-flash {
+  from {
+    background: var(--chg-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+.var-changed {
+  animation: var-flash 900ms ease-out;
+}
+
+/* memory-graph changed/added boxes pulse once when the step changes */
+@keyframes mem-pulse {
+  0% {
+    stroke-opacity: 0.2;
+    stroke-width: 3.5;
+  }
+  100% {
+    stroke-opacity: 1;
+    stroke-width: 1.8;
+  }
+}
+.mem-pulse {
+  animation: mem-pulse 700ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mem-pulse {
+    animation: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .var-changed {
+    animation: none;
+  }
+}
