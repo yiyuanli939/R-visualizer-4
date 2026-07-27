@@ -75,13 +75,17 @@ export class LocalEngine {
         authRequired?: boolean;
         r?: string;
         wd?: string;
+        ver?: string;
       };
       if (h.authRequired) {
         this.initPromise = null;
         this.setStatus("error", "token", true);
         throw new Error("token required");
       }
-      this.healthDetail = `Local R ${h.r} · ${h.wd}`;
+      // protocol handshake: an older running backend silently lacks newer
+      // features (deltas, inspect) — tell the user to restart it
+      const outdated = h.ver !== "2";
+      this.healthDetail = `Local R ${h.r} · ${h.wd}${outdated ? " · ⚠ backend outdated — restart it with the latest rviz-local.R" : ""}`;
       this.setStatus("ready", this.healthDetail);
     } catch (e) {
       this.initPromise = null;

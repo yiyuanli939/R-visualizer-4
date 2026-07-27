@@ -93,6 +93,7 @@ app <- list(
         }
         return(resp(list(ok = TRUE, authRequired = FALSE,
                          r = as.character(getRversion()),
+                         ver = .tr_version(),
                          wd = getwd(), engine = "local")))
       }
       if (!auth_ok(req)) return(resp(list(error = "invalid token"), 401L))
